@@ -1,0 +1,132 @@
+﻿@model Recognize.ViewModels.InputOutputViewModel
+@{
+    ViewBag.Title = "Many patterns";
+}
+<head>
+    <link href="@Url.Content("~/Content/table.css")"
+          rel="stylesheet" type="text/css" />
+</head>
+
+@using (Html.BeginForm("TestMany", "ManyPatterns", FormMethod.Post, new { @id = "formPost" }))
+{
+    <div>
+        <br />
+        <div class="matrix">
+            <label>Input</label>
+            <table class="container">
+                @for (int i = 0; i < 64; i = i + 8)
+                {
+                    <tr>
+                        @for (int j = i; j < i + 8; j++)
+                        {
+                            var name = "neuron" + j.ToString();
+                            var nameId = "idneuron" + j.ToString();
+
+                            var color = "#d9d9d9";
+                            if (Model.Input.neurons[j] == 1)
+                            {
+                                color = "#FF1493";
+                            }
+                            else
+                            {
+                                color = "#d9d9d9";
+                            }
+                            <td><input name="@name" type="button" class="bit" style="background-color: @color !important" onload="getColor(this)" onclick="changeColor(this)" />@Html.HiddenFor(model => model.Input.neurons[j], new { id = nameId })</td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+        <div class="matrix">
+            <label>Output</label>
+            <table class="container">
+                @for (int i = 0; i < 64; i = i + 8)
+                {
+                    <tr>
+                        @for (int j = i; j < i + 8; j++)
+                        {
+                            var color = "#d9d9d9";
+                            if (Model.Output.neurons[j] == 1)
+                            {
+                                color = "black";
+                            }
+                            else
+                            {
+                                color = "#d9d9d9";
+                            }
+                            <td class="out" style="background-color: @color"></td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+    <div class="buttons">
+        <br />
+        <div class="buttons-center">
+            @*<button type="button" name="Clear" class="main-button" onclick="this.for.reset();">Clear values</button>*@
+            <button type="submit" name="Train" class="main-button" formaction="@Url.Action("TrainMany","ManyPatterns")">Train</button>
+            <button type="submit" name="Test" id="buttonPost" class="main-button" formaction="@Url.Action("TestMany","ManyPatterns")">Test</button>
+        </div>
+    </div>
+    <div>
+        <h3>@ViewBag.Message</h3>
+    </div>
+}
+
+<script>
+    //$(element).off().on('click', function () {
+    //    // function body
+    //});
+    function changeColor(id) {
+        var nameId = "#id" + id.name;
+
+        if (id.value == null || id.value == 0) {
+            id.style.backgroundColor = "#FF1493";
+            $(nameId).val(1);
+        } else {
+            id.style.backgroundColor = "#d9d9d9";
+            $(nameId).val(0);
+        }
+    }
+
+    function value(id) {
+        if (id.style.backgroundColor == "black") {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    function getColor(id) {
+        var nameId = "#id" + id.name;
+
+        if ($(nameId).value == 1) {
+            return "#FF1493";
+        }
+        else {
+            return "#d9d9d9";
+        }
+    }
+
+    function clear() {
+
+    }
+
+    //$("#buttonPost").on("click", function () {
+    //    var listName = "NomeTels";
+
+    //    var qtd = 0;
+    //    $("#tablePost > tbody > tr").each(function () {
+    //        var first = $(this).data("nome");
+    //        var secont = $(this).data("tel");
+    //        $("#formPost").prepend("<input type='hidden'
+    //        name='" + listName + "[" + qtd + "].Nome'
+    //        value='"+nome+"'>");
+    //        $("#formPost").prepend("<input type='hidden'
+    //        name='" + listName + "[" + qtd + "].Telefone'
+    //        value='" + tel + "'>");
+    //        qtd += 1;
+    //    });
+    //});
+</script>

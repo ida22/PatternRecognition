@@ -1,0 +1,37 @@
+﻿.bit {
+    width: 40px;
+    height: 35px;
+    border: 1px solid black;
+    /*background-color: #d9d9d9;*/
+    border-radius: 50%;
+}
+
+td {
+    width: 40px;
+    height: 40px;
+}
+
+.bit:hover {
+    background-color: grey;
+}
+
+.out{
+    border: 1px solid black;
+    background-color: #d9d9d9;
+}
+
+.matrix {
+    display: inline-block;
+    width: 49%;
+    text-align: center;
+}
+
+.main-button {
+    width: 100px;
+    padding: 5px;
+    margin: 10px;
+}
+
+.buttons-center {
+    text-align: center;
+}

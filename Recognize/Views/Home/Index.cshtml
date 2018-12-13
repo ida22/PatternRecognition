@@ -1,0 +1,80 @@
+﻿@model Recognize.ViewModels.InputOutputViewModel
+@{
+    ViewBag.Title = "One pattern";
+}
+<head>
+    <link href="@Url.Content("~/Content/table.css")"
+          rel="stylesheet" type="text/css" />
+</head>
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post))
+{
+    <div>
+        @*Prezentacja danych z kontrolera return View(vm)*@
+        @*<h2>@Model.I</h2>
+            <h2>@Model.II</h2>
+            <h2>@Model.III</h2>
+            <h3>@ViewBag.Message</h3>*@
+        <br />
+        <div>
+            @Html.DropDownListFor(model => model.Input.Number, Model.Input.NumbersList, new { @class = "form-control" })
+        </div>
+        <br />
+        <div class="matrix">
+            <label>Input</label>
+            <table class="container">
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+                <tr><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td><td><input type="button" class="bit" onclick="changeColor(this)" /></td></tr>
+            </table>
+        </div>
+        <div class="matrix">
+            <label>Output</label>
+            <table class="container">
+                @for (int i = 0; i < 64; i = i + 8)
+                {
+                    <tr>
+                        <td class="out">@Model.Output.neurons[i]</td>
+                        <td class="out">@Model.Output.neurons[i + 1]</td>
+                        <td class="out">@Model.Output.neurons[i + 2]</td>
+                        <td class="out">@Model.Output.neurons[i + 3]</td>
+                        <td class="out">@Model.Output.neurons[i + 4]</td>
+                        <td class="out">@Model.Output.neurons[i + 5]</td>
+                        <td class="out">@Model.Output.neurons[i + 6]</td>
+                        <td class="out">@Model.Output.neurons[i + 7]</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+    <div class="buttons">
+        <br />
+        <div class="buttons-center">
+            <input type="button" value="Train" class="main-button" />
+            <button type="submit" name="Test" class="main-button">Test</button>
+        </div>
+    </div>
+}
+
+<script>
+    function changeColor(id) {
+        if (id.style.backgroundColor == "black") {
+            id.style.backgroundColor = "#d9d9d9";
+        } else {
+            id.style.backgroundColor = "black";
+        }
+    }
+
+    function value(id) {
+        if (id.style.backgroundColor == "black") {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+</script>
