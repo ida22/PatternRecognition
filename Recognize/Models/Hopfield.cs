@@ -13,7 +13,9 @@ namespace Recognize.Models
         #region Declarations
 
         private Matrix _weights;
+        public double[,] _lepszeWeights;
         private Matrix _output;
+        private int[] _lepszeOutput;
         private Matrix _offsetNeuronWeights;
         private long _iterations = 0;
         private int _neuronCount = 0;
@@ -80,14 +82,16 @@ namespace Recognize.Models
 
         public void TrainByPseudoInverse(double[,] testData)
         {
-            int rowCount = testData.Rows();
-            int rowLength = testData.Columns();
+            testData = testData.Multiply(2).Subtract(1);
 
-            double[,] W = new double[rowLength, rowLength];
+            int rowCount = testData.Rows();
+            _neuronCount = testData.Columns();
+
+            double[,] W = new double[_neuronCount, _neuronCount];
 
             for(int row = 0; row < rowCount; row++)
             {
-                double[,] x = testData.Get(row, row + 1, 0, rowLength).Transpose();
+                double[,] x = testData.Get(row, row + 1, 0, _neuronCount).Transpose();
 
                 var x1 = W.Dot(x).Subtract(x);
                 var x1t = x1.Transpose();
@@ -96,8 +100,63 @@ namespace Recognize.Models
                 double mianownik = x.TransposeAndDot(x).Subtract(x.Transpose().Dot(W).Dot(x))[0,0];
 
                 W = W.Add(licznik.Divide(mianownik));
+
+                //for (int i = 0; i < 64; i++)
+                //{
+                //    W[i, i] = 0;
+                //}
             }
+
+            //for (int i = 0; i < 64; i++)
+            //{
+            //    W[i, i] = 0;
+            //}
+
+            _lepszeWeights = W;
+            var suma = W.Sum();
             _weights = new Matrix(W);
+        }
+
+        public int[] LepszyTest(int[] testData)
+        {
+            testData = testData.Multiply(2).Subtract(1);
+
+            long maxIterations = Convert.ToInt64(Math.Pow(_neuronCount, 2));
+            //bool isStable = false;
+
+            //create an ordered array and then shuffle it
+            int[] updateOrder = new int[_neuronCount];
+            for (int index = 0; index < _neuronCount; index++)
+            {
+                updateOrder[index] = index;
+            }
+            updateOrder = Shuffle(updateOrder);
+
+            _lepszeOutput = testData;
+
+            int updatedCount = 0;
+            int iterationCount = 0;
+
+            do
+            {
+                updatedCount = 0;
+
+                for(int i=0; i<_neuronCount; i++)
+                {
+                    int neuronId = updateOrder[i];
+                    var Vin = _lepszeWeights.GetColumn(neuronId).Dot(_lepszeOutput);
+                    var V = (Vin >= 0 ? 1 : -1);
+                    if(_lepszeOutput[neuronId] != V)
+                    {
+                        updatedCount++;
+                        _lepszeOutput[neuronId] = V;
+                    }
+                }
+
+                iterationCount++;
+            } while (updatedCount != 0 && iterationCount < maxIterations);
+
+            return _lepszeOutput;
         }
 
         /// <summary>
