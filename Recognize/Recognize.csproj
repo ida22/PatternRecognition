@@ -239,6 +239,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ART.cs" />
+    <Compile Include="Models\ART1.cs" />
     <Compile Include="Models\Hopfield.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Matrix.cs" />

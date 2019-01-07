@@ -15,7 +15,8 @@ namespace Recognize.Controllers
             var vm = new InputOutputViewModel();
             vm.Input = new MatrixViewModel();
             vm.Input.neurons = new int[64];
-            vm.Output = new MatrixViewModel();
+            vm.HopfieldOutput = new MatrixViewModel();
+            vm.ARTOutput = new MatrixViewModel();
             IEnumerable<PatternNumbers> numbers = Enum.GetValues(typeof(PatternNumbers)).Cast<PatternNumbers>();
 
             vm.Input.NumbersList = from number in numbers
@@ -27,7 +28,8 @@ namespace Recognize.Controllers
 
             double[] pattern000 = { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 };
             int[] pattern8 = { 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 };
-            vm.Output.neurons = pattern8;
+            vm.HopfieldOutput.neurons = pattern8;
+            vm.ARTOutput.neurons = pattern8;
 
             return View(vm);
         }
@@ -38,7 +40,8 @@ namespace Recognize.Controllers
             int[] matrix = model.Input.neurons;
 
             var vm = new InputOutputViewModel();
-            vm.Output = new MatrixViewModel();
+            vm.HopfieldOutput = new MatrixViewModel();
+            vm.ARTOutput = new MatrixViewModel();
 
             int[] patterns = {
             0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
@@ -99,7 +102,7 @@ namespace Recognize.Controllers
 
             int[] neurons = new int[64];
             //neurons = output1.ToArray();
-            vm.Output.neurons = neurons;
+            vm.HopfieldOutput.neurons = neurons;
 
             return View(vm);
         }
@@ -114,9 +117,11 @@ namespace Recognize.Controllers
             double[] testpattern8 = { 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 };
             int[] testpattern0 = { 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 };
 
-            vm.Output = new MatrixViewModel();
+            vm.HopfieldOutput = new MatrixViewModel();
+            vm.ARTOutput = new MatrixViewModel();
             //vm.Output.neurons = testPattern8;
-            vm.Output.neurons = testpattern0;
+            vm.HopfieldOutput.neurons = testpattern0;
+            vm.ARTOutput.neurons = testpattern0;
 
             return View(vm);
         }
@@ -128,7 +133,8 @@ namespace Recognize.Controllers
             var vm = new InputOutputViewModel();
             vm.Input = new MatrixViewModel();
             vm.Input.neurons = new int[64];
-            vm.Output = new MatrixViewModel();
+            vm.HopfieldOutput = new MatrixViewModel();
+            vm.ARTOutput = new MatrixViewModel();
 
             int[] patterns = {
             0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
@@ -186,7 +192,8 @@ namespace Recognize.Controllers
 
             int[] neurons = new int[64];
             //neurons = output1.ToArray();
-            vm.Output.neurons = neurons;
+            vm.HopfieldOutput.neurons = neurons;
+            vm.ARTOutput.neurons = neurons;
 
             return View("ManyPatterns", vm);
         }
@@ -201,8 +208,11 @@ namespace Recognize.Controllers
             vm.Input.neurons = new int[64];
 
             ViewBag.Message = "Sieć została przetrenowana narysowanym wzorcem.";
-            vm.Output = new MatrixViewModel();
-            vm.Output.neurons = new int[64];
+            vm.HopfieldOutput = new MatrixViewModel();
+            vm.HopfieldOutput.neurons = new int[64];
+
+            vm.ARTOutput = new MatrixViewModel();
+            vm.ARTOutput.neurons = new int[64];
 
             int[] patterns = {
             0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,

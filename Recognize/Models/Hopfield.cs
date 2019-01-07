@@ -82,12 +82,12 @@ namespace Recognize.Models
 
         public void TrainByPseudoInverse(double[,] testData)
         {
-            testData = testData.Multiply(2).Subtract(1);
+            testData = testData.Multiply(2).Subtract(1); // macierz -1 i 1
 
-            int rowCount = testData.Rows();
-            _neuronCount = testData.Columns();
+            int rowCount = testData.Rows(); //liczba wzorców
+            _neuronCount = testData.Columns(); //liczba neuronów we wzorcu
 
-            double[,] W = new double[_neuronCount, _neuronCount];
+            double[,] W = new double[_neuronCount, _neuronCount]; //inicjalizacja macierzy wag 64x64
 
             for(int row = 0; row < rowCount; row++)
             {

@@ -38,33 +38,58 @@
             </table>
         </div>
         <div class="matrix">
-            <label>Output</label>
-            <table class="container">
-                @for (int i = 0; i < 64; i = i + 8)
+            <div class="network-outputs">
+                <label>Hopfield</label>
+                <table class="container">
+                    @for (int i = 0; i < 64; i = i + 8)
                 {
-                    <tr>
-                        @for (int j = i; j < i + 8; j++)
-                        {
-                            var color = "#d9d9d9";
-                            if (Model.Output.neurons[j] == 1)
+                        <tr>
+                            @for (int j = i; j < i + 8; j++)
                             {
-                                color = "black";
+                                var color = "#d9d9d9";
+                                if (Model.HopfieldOutput.neurons[j] == 1)
+                                {
+                                    color = "black";
+                                }
+                                else
+                                {
+                                    color = "#d9d9d9";
+                                }
+                                <td class="out" style="background-color: @color"></td>
                             }
-                            else
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="network-outputs">
+                <label>ART 1</label>
+                <table class="container">
+                    @for (int i = 0; i < 64; i = i + 8)
+                {
+                        <tr>
+                            @for (int j = i; j < i + 8; j++)
                             {
-                                color = "#d9d9d9";
+                                var color = "#d9d9d9";
+                                if (Model.ARTOutput.neurons[j] == 1)
+                                {
+                                    color = "black";
+                                }
+                                else
+                                {
+                                    color = "#d9d9d9";
+                                }
+                                <td class="out" style="background-color: @color"></td>
                             }
-                            <td class="out" style="background-color: @color"></td>
-                        }
-                    </tr>
-                }
-            </table>
+                        </tr>
+                    }
+                </table>
+            </div>
         </div>
     </div>
     <div class="buttons">
         <br />
         <div class="buttons-center">
-            @*<button type="button" name="Clear" class="main-button" onclick="this.for.reset();">Clear values</button>*@
+            <button type="submit" name="Clear" class="main-button" formaction="@Url.Action("Index","ManyPatterns")">Clear</button>
             <button type="submit" name="Train" class="main-button" formaction="@Url.Action("TrainMany","ManyPatterns")">Train</button>
             <button type="submit" name="Test" id="buttonPost" class="main-button" formaction="@Url.Action("TestMany","ManyPatterns")">Test</button>
         </div>
@@ -93,18 +118,15 @@
     function changeColor(id) {
         debugger;
         var nameId = "#id" + id.name;
+        var hiddenElement = $(nameId);
 
-        if (id.value == null || id.value == 0) {
+        if (hiddenElement[0].value == 0) {
             id.style.backgroundColor = "#FF1493";
-            $(nameId).val(1);
+            hiddenElement[0].value = 1;
         }
-        //if (id.value == 1) {
-        //    id.style.backgroundColor = "#d9d9d9";
-        //    $(nameId).val(0);
-        //}
         else {
             id.style.backgroundColor = "#d9d9d9";
-            $(nameId).val(0);
+            hiddenElement[0].value = 0;
         }
     }
 
@@ -125,10 +147,6 @@
         else {
             return "#d9d9d9";
         }
-    }
-
-    function clear() {
-
     }
 
     //$("#buttonPost").on("click", function () {

@@ -39,14 +39,14 @@
                 @for (int i = 0; i < 64; i = i + 8)
                 {
                     <tr>
-                        <td class="out">@Model.Output.neurons[i]</td>
-                        <td class="out">@Model.Output.neurons[i + 1]</td>
-                        <td class="out">@Model.Output.neurons[i + 2]</td>
-                        <td class="out">@Model.Output.neurons[i + 3]</td>
-                        <td class="out">@Model.Output.neurons[i + 4]</td>
-                        <td class="out">@Model.Output.neurons[i + 5]</td>
-                        <td class="out">@Model.Output.neurons[i + 6]</td>
-                        <td class="out">@Model.Output.neurons[i + 7]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i + 1]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i + 2]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i + 3]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i + 4]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i + 5]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i + 6]</td>
+                        <td class="out">@Model.HopfieldOutput.neurons[i + 7]</td>
                     </tr>
                 }
             </table>
