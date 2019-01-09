@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using AForge;
 using Accord.Math;
-using Accord.Math.Decompositions;
 
 namespace Recognize.Models
 {
@@ -20,6 +15,8 @@ namespace Recognize.Models
         private long _iterations = 0;
         private int _neuronCount = 0;
         private const double THRESHOLD_CONSTANT = 0.0;
+
+		public bool trained = false;
 
         #endregion
 
@@ -80,7 +77,7 @@ namespace Recognize.Models
             return _weights;
         }
 
-        public void TrainByPseudoInverse(double[,] testData)
+        public void TrainByPseudoInverse(int[,] testData)
         {
             testData = testData.Multiply(2).Subtract(1); // macierz -1 i 1
 
@@ -91,7 +88,7 @@ namespace Recognize.Models
 
             for(int row = 0; row < rowCount; row++)
             {
-                double[,] x = testData.Get(row, row + 1, 0, _neuronCount).Transpose();
+                double[,] x = testData.Get(row, row + 1, 0, _neuronCount).Transpose().Convert(i => (double)i);
 
                 var x1 = W.Dot(x).Subtract(x);
                 var x1t = x1.Transpose();
@@ -115,7 +112,9 @@ namespace Recognize.Models
             _lepszeWeights = W;
             var suma = W.Sum();
             _weights = new Matrix(W);
-        }
+
+			trained = true;
+		}
 
         public int[] LepszyTest(int[] testData)
         {

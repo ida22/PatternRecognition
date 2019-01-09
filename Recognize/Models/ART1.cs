@@ -3,147 +3,142 @@ using System;
 
 namespace Recognize.Models
 {
-    public class ART1
-    {
-        public static int neuronsCount;
-        public static int patternsCount;
-        public static int trainingPatternsCount;
+	public class ART1
+	{
+		public int neuronsCount;
+		public int patternsCount;
 
-        public static double VIGILANCE = 0.5;
+		public double TRAIN_VIGILANCE = 1;
+		public double TEST_VIGILANCE = 0.5;
 
-        public static double[,] bw;    //Bottom-up weights.
-        public static double[,] tw;    //Top-down weights.
+		public int resetLimit = 100;
 
-        public static double[] f1a;        //Input layer. powinno byc int
-        public static double[] f1b;        //Interface layer. powinno byc int
-        public static double[] f2;
+		public double[,] bw;    //Bottom-up weights.
+		public double[,] tw;    //Top-down weights.
 
-        private int[] membership;
+		public int[] f1a;
+		public int[] f1b;
+		public double[] f2;
 
-        public void Train(double[,] data)
-        {
-            int inputSum = 0;
-            int activationSum = 0;
-            int f2Max = 0;
-            bool reset = true;
-            patternsCount = 10; //przekazane jako arg funkcji
-            int pupa2 = data.Rows();
-            neuronsCount = data.Columns();
+		public bool trained = false;
 
-            bw = new double[patternsCount, neuronsCount];    //Bottom-up weights.
-            tw = new double[patternsCount, neuronsCount];    //Top-down weights.
+		public void Train(int[,] data)
+		{
+			patternsCount = data.Rows();
+			neuronsCount = data.Columns();
 
-            f1b = new double[neuronsCount];        //Interface layer. powinno byc int
-            f2 = new double[patternsCount];
+			bw = new double[patternsCount, neuronsCount];    //Bottom-up weights.
+			tw = new double[patternsCount, neuronsCount];    //Top-down weights.
 
-            membership = new int[patternsCount];
+			f1a = new int[neuronsCount];
+			f1b = new int[neuronsCount];
+			f2 = new double[patternsCount];
 
-            // Initialize top-down weight matrix filled by ones
-            tw.Set(1);
+			// Initialize top-down weight matrix filled by ones
+			tw.Set(1);
 
-            // Initialize bottom-up weight matrix.
-            bw.Set(1.0 / (1.0 + neuronsCount));
+			// Initialize bottom-up weight matrix.
+			bw.Set(1.0 / (1.0 + neuronsCount));
 
-            for (int row = 0; row < pupa2; row++)
-            {
-                // Initialize f2 layer activations to 0.0
-                f2.Set(0, 0, patternsCount);
+			for (int row = 0; row < patternsCount; row++)
+			{
+				Console.Write("{0} ", Magic(data.GetRow(row), true));
+			}
 
-                // Input pattern() to F1 layer.
-                f1a = data.GetRow(row);
+			trained = true;
+		}
 
-                // Compute sum of input pattern.
-                inputSum = (int)f1a.Sum();
+		public int Test(int[] data)
+		{
+			return Magic(data, false);
+		}
 
-                // Compute activations for each node in the F1 layer.
-                // Send input signal from f1a to the f1b layer.
-                f1a.CopyTo(f1b);
+		private int Magic(int[] pattern, bool train)
+		{
+			int inputSum = 0;
+			int activationSum = 0;
+			int f2Max = 0;
 
-                // Compute net input for each node in the f2 layer.
-                for (int i = 0; i < patternsCount; i++)
-                {
-                    for (int j = 0; j < neuronsCount; j++)
-                    {
-                        f2[i] += bw[i,j] * f1a[j];
-                    }
-                }
+			// Initialize f2 layer activations to 0.0
+			f2.Set(0, 0, patternsCount);
 
-                reset = true;
-                while (reset == true)
-                {
-                    // Determine the largest value of the f2 nodes.
-                    f2Max = f2.IndexOf(f2.Max());
+			// Input pattern() to F1 layer.
+			f1a = pattern;
 
-                    // Recompute the f1a to f1b activations (perform AND function).
-                    for (int i = 0; i < neuronsCount; i++)
-                    {
-                        f1b[i] = f1a[i] * Math.Floor(tw[f2Max, i]);
-                    }
+			// Compute sum of input pattern.
+			inputSum = f1a.Sum();
 
-                    // Compute sum of input pattern.
-                    activationSum = (int)f1b.Sum();
+			// Compute activations for each node in the F1 layer.
+			// Send input signal from f1a to the f1b layer.
+			f1a.CopyTo(f1b);
 
-                    reset = testForReset(activationSum, inputSum, f2Max);
-                }
+			// Compute net input for each node in the f2 layer.
+			for (int i = 0; i < patternsCount; i++)
+			{
+				for (int j = 0; j < neuronsCount; j++)
+				{
+					f2[i] += bw[i, j] * f1a[j];
+				}
+			}
 
-                // Only use number of TRAINING_PATTERNS for training, the rest are tests.
-                if (row < patternsCount)
-                {
-                    updateWeights(activationSum, f2Max);
-                }
+			bool reset = true;
+			int limit = resetLimit;
+			//Console.Write("sss");
+			while (reset == true)
+			{
+				// Determine the largest value of the f2 nodes.
+				f2Max = f2.IndexOf(f2.Max());
+				//Console.Write(f2Max);
 
-                // Record which cluster the input vector is assigned to.
-                membership[row] = f2Max;
+				// Recompute the f1a to f1b activations (perform AND function).
+				for (int i = 0; i < neuronsCount; i++)
+				{
+					f1b[i] = f1a[i] * (int)Math.Floor(tw[f2Max, i]);
+				}
 
-            }
-            return;
+				// Compute sum of input pattern.
+				activationSum = f1b.Sum();
 
-        }
+				reset = TestForReset(activationSum, inputSum, f2Max, train);
 
-        private static bool testForReset(int activationSum, int inputSum, int f2Max)
-        {
-            if (activationSum / inputSum >= VIGILANCE)
-            {
-                return false;     // Candidate is accepted.
-            }
-            else
-            {
-                f2[f2Max] = -1.0; // Inhibit.
-                return true;      // Candidate is rejected.
-            }
-        }
+				if (--limit == 0)
+					return -1;
+			}
+			//Console.WriteLine("");
 
-        private static void updateWeights(int activationSum, int f2Max)
-        {
-            // Update bw(f2Max)
-            for (int i = 0; i < neuronsCount; i++)
-            {
-                bw[f2Max, i] = (2.0 * f1b[i]) / (1.0 + activationSum);
-            }
 
-            // Update tw(f2Max)
-            for (int i = 0; i < neuronsCount; i++)
-            {
-                tw[f2Max, i] = f1b[i];
-            }
-            return;
-        }
+			if (train) UpdateWeights(activationSum, f2Max);
 
-        public double[] ToVector(double[,] data)
-        {
-            double[] vector = new double[data.Rows() * data.Columns()];
-            int k = 0;
+			return f2Max;
+		}
 
-            for (int i = 0; i < data.Rows(); i++)
-            {
-                for (int j = 0; j < data.Columns(); j++)
-                {
-                    vector[k] = data[i, j];
-                    k++;
-                }
-            }
+		private bool TestForReset(int activationSum, int inputSum, int f2Max, bool train)
+		{
+			if ((double)activationSum / (double)inputSum >= (train ? TRAIN_VIGILANCE : TEST_VIGILANCE))
+			{
+				return false;     // Candidate is accepted.
+			}
+			else
+			{
+				f2[f2Max] = -1.0; // Inhibit.
+				return true;      // Candidate is rejected.
+			}
+		}
 
-            return vector;
-        }
-    }
+		private void UpdateWeights(int activationSum, int f2Max)
+		{
+			// Update bw(f2Max)
+			for (int i = 0; i < neuronsCount; i++)
+			{
+				bw[f2Max, i] = (2.0 * f1b[i]) / (1.0 + activationSum);
+			}
+
+			// Update tw(f2Max)
+			for (int i = 0; i < neuronsCount; i++)
+			{
+				tw[f2Max, i] = f1b[i];
+			}
+			return;
+		}
+	}
 }
