@@ -2,6 +2,7 @@
 using Recognize.ViewModels;
 using System.Web.Mvc;
 using Accord.Math;
+using System.Linq;
 
 namespace Recognize.Controllers
 {
@@ -46,7 +47,7 @@ namespace Recognize.Controllers
 		static Hopfield hp;	// zjebane, nie powinno być static (??)
 		static ART1 art;	// same
 
-		public ActionResult Index()
+		public ActionResult Index(bool? selection)
 		{
 			ViewBag.Message = "";
 			var vm = new InputOutputViewModel();
@@ -55,9 +56,15 @@ namespace Recognize.Controllers
 			vm.HopfieldOutput = new MatrixViewModel(64);
 			vm.ARTOutput = new MatrixViewModel(64);
 
-			//vm.Weights = new double[64, 64];
+            //vm.Weights = new double[64, 64];
+            if (selection==true && selection!= null)
+            {
+                vm.Input.neurons = Enumerable.Repeat(1, 64).ToArray();
+            }
 
-			return View(vm);
+            vm.patterns = patterns;
+
+            return View(vm);
 		}
 
 		[HttpPost]
@@ -65,10 +72,11 @@ namespace Recognize.Controllers
 		{
 			vm.HopfieldOutput = new MatrixViewModel(64);	// dlaczego to trzeba tutaj znów tworzyć ???
 			vm.ARTOutput = new MatrixViewModel(64);
+            vm.patterns = patterns;
 
-			if(hp == null || art == null || hp.trained == false || art.trained == false)
+            if (hp == null || art == null || hp.trained == false || art.trained == false)
 			{
-				ViewBag.Message = "Sieci jeszcze nie umiejo!";
+				ViewBag.Message = "You have to train neural networks before testing.";
 				return View("Index", vm);
 			}
 
@@ -77,7 +85,7 @@ namespace Recognize.Controllers
 
 			vm.HopfieldOutput.neurons = outputHP;
 			if(outputART == -1)
-				ViewBag.Message = "ART nie kuma!";
+				ViewBag.Message = "ART cannot recognize pattern.";
 			else
 				vm.ARTOutput.neurons = patterns.GetRow(outputART);
 
@@ -89,16 +97,18 @@ namespace Recognize.Controllers
 		{
 			vm.HopfieldOutput = new MatrixViewModel(64);    // dlaczego to trzeba tutaj znów tworzyć ???
 			vm.ARTOutput = new MatrixViewModel(64);
+            vm.patterns = patterns;
 
-			// trenowanie Hopfielda
-			hp = new Hopfield();
+
+            // trenowanie Hopfielda
+            hp = new Hopfield();
 			hp.TrainByPseudoInverse(patterns);
 
 			//trenowanie ART
 			art = new ART1();
 			art.Train(patterns);
 
-			ViewBag.Message = "Sieci takie mądre! ^;;^";
+			ViewBag.Message = "Neural networks were trained by patterns.";
 
 			return View("Index", vm);
 		}

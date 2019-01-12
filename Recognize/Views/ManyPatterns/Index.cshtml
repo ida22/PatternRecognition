@@ -1,7 +1,4 @@
 ﻿@model Recognize.ViewModels.InputOutputViewModel
-@{
-    ViewBag.Title = "Many patterns";
-}
 <head>
     <link href="@Url.Content("~/Content/table.css")"
           rel="stylesheet" type="text/css" />
@@ -10,6 +7,32 @@
 @using (Html.BeginForm("TestMany", "ManyPatterns", FormMethod.Post, new { @id = "formPost" }))
 {
     <div>
+        <div>
+            <br />
+            <label>Patterns</label>
+            <br />
+            <div class="patterns">
+                @for (int k = 0; k < Model.patterns.Length / 64; k++) //k<10
+                {
+                    <div class="patterns">
+                        <table class="container">
+                            @for (int i = 0; i < 64; i = i + 8)
+                            {
+                                <tr>
+                                    @for (int j = i; j < i + 8; j++)
+                                    {
+                                        var color = "#d9d9d9";
+                                        if (Model.patterns[k, j] == 1) { color = "black"; }
+                                        else { color = "#d9d9d9"; }
+                                        <td class="pattern-td" style="background-color: @color"></td>
+                                    }
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
         <br />
         <div class="matrix">
             <label>Input</label>
@@ -23,14 +46,8 @@
                             var nameId = "idneuron" + j.ToString();
 
                             var color = "#d9d9d9";
-                            if (Model.Input.neurons[j] == 1)
-                            {
-                                color = "#FF1493";
-                            }
-                            else
-                            {
-                                color = "#d9d9d9";
-                            }
+                            if (Model.Input.neurons[j] == 1) { color = "#FF1493"; }
+                            else { color = "#d9d9d9"; }
                             <td><input name="@name" type="button" class="bit" style="background-color: @color !important" onload="getColor(this)" onclick="changeColor(this)" />@Html.HiddenFor(model => model.Input.neurons[j], new { id = nameId })</td>
                         }
                     </tr>
@@ -47,14 +64,8 @@
                             @for (int j = i; j < i + 8; j++)
                             {
                                 var color = "#d9d9d9";
-                                if (Model.HopfieldOutput.neurons[j] == 1)
-                                {
-                                    color = "black";
-                                }
-                                else
-                                {
-                                    color = "#d9d9d9";
-                                }
+                                if (Model.HopfieldOutput.neurons[j] == 1) { color = "black"; }
+                                else { color = "#d9d9d9"; }
                                 <td class="out" style="background-color: @color"></td>
                             }
                         </tr>
@@ -65,19 +76,13 @@
                 <label>ART 1</label>
                 <table class="container">
                     @for (int i = 0; i < 64; i = i + 8)
-                {
+                    {
                         <tr>
                             @for (int j = i; j < i + 8; j++)
                             {
                                 var color = "#d9d9d9";
-                                if (Model.ARTOutput.neurons[j] == 1)
-                                {
-                                    color = "black";
-                                }
-                                else
-                                {
-                                    color = "#d9d9d9";
-                                }
+                                if (Model.ARTOutput.neurons[j] == 1) { color = "black"; }
+                                else { color = "#d9d9d9"; }
                                 <td class="out" style="background-color: @color"></td>
                             }
                         </tr>
@@ -90,28 +95,32 @@
         <br />
         <div class="buttons-center">
             <button type="submit" name="Clear" class="main-button" formaction="@Url.Action("Index","ManyPatterns")">Clear</button>
+            <button type="submit" name="SelectAll" class="main-button" formaction="@Url.Action("Index","ManyPatterns", new { selection = true})">Select All</button>
             <button type="submit" name="Train" class="main-button" formaction="@Url.Action("TrainMany","ManyPatterns")">Train</button>
             <button type="submit" name="Test" id="buttonPost" class="main-button" formaction="@Url.Action("TestMany","ManyPatterns")">Test</button>
         </div>
     </div>
+    if (ViewBag.Message != "")
+    {
+        <div class="alert-message warning">
+            <p class="alert alert-info" id="successMessage" style="margin-top:1em;">@ViewBag.Message</p>
+        </div>
+    }
     @*<div class="matrix">
-        <label>Weights</label>
-        <table class="container">
-            @for (int i = 0; i < 64; i++)
-                {
-                <tr>
-                    @for (int j = 0; j < 64; j++)
+            <label>Weights</label>
+            <table class="container">
+                @for (int i = 0; i < 64; i++)
                     {
-                       
-                        <td class="out">@Model.Weights[i,j].ToString("0.00")</td>
-                    }
-                </tr>
-            }
-        </table>
-    </div>*@
-    <div>
-        <h3>@ViewBag.Message</h3>
-    </div>
+                    <tr>
+                        @for (int j = 0; j < 64; j++)
+                        {
+
+                            <td class="out">@Model.Weights[i,j].ToString("0.00")</td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>*@
 }
 
 <script>
@@ -148,21 +157,4 @@
             return "#d9d9d9";
         }
     }
-
-    //$("#buttonPost").on("click", function () {
-    //    var listName = "NomeTels";
-
-    //    var qtd = 0;
-    //    $("#tablePost > tbody > tr").each(function () {
-    //        var first = $(this).data("nome");
-    //        var secont = $(this).data("tel");
-    //        $("#formPost").prepend("<input type='hidden'
-    //        name='" + listName + "[" + qtd + "].Nome'
-    //        value='"+nome+"'>");
-    //        $("#formPost").prepend("<input type='hidden'
-    //        name='" + listName + "[" + qtd + "].Telefone'
-    //        value='" + tel + "'>");
-    //        qtd += 1;
-    //    });
-    //});
 </script>
