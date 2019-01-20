@@ -2,3 +2,5 @@ Recognize/bin
 Recognize/obj
 packages
 .vs
+*.user
+
