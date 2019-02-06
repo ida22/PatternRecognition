@@ -12,94 +12,104 @@ namespace Recognize.Models
         public int patternsCount = 0;
         public int outputCount = 10;
         public double rho = 0.3;
+        public double TRAIN_VIGILANCE = 0.9;
+        public double TEST_VIGILANCE = 0.5;
         public int active = 0;
+        public int resetLimit = 100;
 
-        public double[,] weights;
-        public int[] output;
+        int[,] F1; //warstwa porównawcza, zawiera wektory wejściowe (N)
+        double[,] F2; //warstwa rozpoznająca (M - liczba wyjściowych neuronów)  F2 = y
 
-        public void Train(double[,] data)
+        double[,] W;
+        double[,] V;
+
+        public bool trained = false;
+
+        public void Train(int[,] data)
         {
             patternsCount = data.Rows();
             neuronsCount = data.Columns();
 
-            double[,] F1 = new double[neuronsCount, 1]; //warstwa porównawcza, zawiera wektory wejściowe (N)
-            double[,] F2 = new double[outputCount, 1]; //warstwa rozpoznająca (M - liczba wyjściowych neuronów)
-            F1.Set(1);
-            F2.Set(1);
+            F1 = new int[neuronsCount, 1]; //warstwa porównawcza, zawiera wektory wejściowe (N)
+            F2 = new double[patternsCount, 1]; //warstwa rozpoznająca (M - liczba wyjściowych neuronów)  F2 = y
 
-            double[,] W = new double[outputCount, neuronsCount];
-            double[,] V = new double[neuronsCount, outputCount];
-      
-            // wypełnić macierz W i V randomowymi liczbami z przedzialu?
-            Random r = new Random();
-            W = W.Apply(x => r.NextDouble());
-            V = V.Apply(x => r.NextDouble());
+            W = new double[patternsCount, neuronsCount];
+            V = new double[patternsCount, neuronsCount];
+
+            W.Set(1.0 / (1.0 + neuronsCount));
+            V.Set(1);
 
             for (int pattern = 0; pattern < patternsCount; pattern++)
             {
-                double[,] x = data.Get(pattern, pattern + 1, 0, neuronsCount);
-                F2 = W.Dot(x);
+                F1 = data.Get(pattern, pattern + 1, 0, neuronsCount);
 
-                var I = ToVector(F2).ArgSort(); //indeksy posortowanego F2
+                F2[pattern, 0] = W.GetRow(pattern).DotWithTransposed(F1)[0]; //krok 2
 
-                foreach (int i in I)
-                {
-                    double d = (W.GetColumn(i).Multiply(ToVector(x))).Sum() / x.Sum();
-                    if (d >= rho)
-                    {
-                        W.SetColumn(i, W.GetColumn(i).Dot(x));
-                        V.SetRow(i, W.GetColumn(i).Divide((0.5 + W.GetColumn(i).Sum())));
-                    }
-
-                    if (active < F2.Length)
-                    {
-                        int j = active;
-                        W.SetColumn(j, W.GetColumn(j).Dot(x));
-                        V.SetRow(j, W.GetColumn(j).Divide((0.5 + W.GetColumn(i).Sum())));
-                        active++;
-                    }
-                }
+                MagicIda(F1, true);
             }
+
+            trained = true;
         }
 
-        public int[] Test(double[,] testdata)
+        public int Test(int[] data)
         {
-            return output;
+            int[,] newData = new int[1, neuronsCount];
+            newData.SetRow(0, data);
+
+            return MagicIda(newData, false);
         }
 
-        public double[] ToVector(double[,] data)
+        public int MagicIda(int[,] data, bool train)
         {
-            double[] vector = new double[data.Rows() * data.Columns()];
-            int k = 0;
+            int m = 0;
+            bool reset = true;
+            int limit = resetLimit;
 
-            for (int i = 0; i < data.Rows(); i++)
+            while (reset == true)
             {
-                for (int j = 0; j < data.Columns(); j++)
-                {
-                    vector[k] = data[i, j];
-                    k++;
-                }
+                m = F2.ArgMax().Item1; //krok 3
+
+                double licznik = V.GetRow(m).DotWithTransposed(data)[0];
+                int mianownik = data.Sum();
+
+                reset = TestForReset(licznik, mianownik, m, train);
+
+                if (--limit == 0)
+                    return -1;
             }
 
-            return vector;
+            if (train) UpdateWeights(F1, m);
+
+
+            return m;
         }
 
-        public double[,] ToMatrix(double[] data)
+        private bool TestForReset(double licznik, int mianownik, int m, bool train)
         {
-            double rowCount = Math.Sqrt(data.Length);
-            double[,] matrix = new double[(int)rowCount, (int)rowCount];
-            int k = 0;
-
-            for (int i = 0; i < rowCount; i++)
+            if (licznik / mianownik >= (train ? TRAIN_VIGILANCE : TEST_VIGILANCE))
             {
-                for (int j = 0; j < rowCount; j++)
-                {
-                    matrix[i, j] = data[k];
-                    k++;
-                }
+                return false;     // Candidate is accepted.
             }
+            else
+            {
+                F2[m, 0] = -1.0; // Inhibit.
+                return true;      // Candidate is rejected.
+            }
+        }
 
-            return matrix;
+        private void UpdateWeights(int[,] F1, int m)
+        {
+            double[,] tempV = new double[patternsCount, neuronsCount];
+            double[,] tempW = new double[patternsCount, neuronsCount];
+            V.CopyTo(tempV);
+
+            var row = tempV.GetRow(m).Multiply(F1.GetRow(0));
+            V.SetRow(m, row);
+
+            var row2 = row.Divide(0.5 + tempV.GetRow(m).DotWithTransposed(F1)[0]);
+            W.SetRow(m, row2);
+
+            return;
         }
     }
 }

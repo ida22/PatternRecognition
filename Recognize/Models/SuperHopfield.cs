@@ -38,13 +38,13 @@ namespace Recognize.Models
                 return _weights;
             }
         }
-        public Matrix TrainingData
-        {
-            set
-            {
-                _weights = _network.Train(value);
-            }
-        }
+        //public Matrix TrainingData
+        //{
+        //    set
+        //    {
+        //        _weights = _network.Train(value);
+        //    }
+        //}
 
         #endregion
 

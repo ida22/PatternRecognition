@@ -27,18 +27,18 @@ namespace Recognize.Models
 			patternsCount = data.Rows();
 			neuronsCount = data.Columns();
 
-			bw = new double[patternsCount, neuronsCount];    //Bottom-up weights.
-			tw = new double[patternsCount, neuronsCount];    //Top-down weights.
+			bw = new double[patternsCount, neuronsCount];    //Bottom-up weights. w
+			tw = new double[patternsCount, neuronsCount];    //Top-down weights. v
 
 			f1a = new int[neuronsCount];
 			f1b = new int[neuronsCount];
 			f2 = new double[patternsCount];
 
-			// Initialize top-down weight matrix filled by ones
-			tw.Set(1);
+			// Initialize top-down weight matrix filled by ones V
+			tw.Set(1); 
 
-			// Initialize bottom-up weight matrix.
-			bw.Set(1.0 / (1.0 + neuronsCount));
+			// Initialize bottom-up weight matrix. W
+			bw.Set(1.0 / (1.0 + neuronsCount)); 
 
 			for (int row = 0; row < patternsCount; row++)
 			{
