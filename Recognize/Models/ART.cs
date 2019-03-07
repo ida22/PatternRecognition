@@ -8,13 +8,13 @@ namespace Recognize.Models
 {
     public class ART
     {
-        public int neuronsCount = 0;
-        public int patternsCount = 0;
+        public int neuronsCount = 64;
+        public int patternsCount = 10;
         public int outputCount = 10;
-        public double rho = 0.3;
-        public double TRAIN_VIGILANCE = 0.9;
-        public double TEST_VIGILANCE = 0.5;
-        public int active = 0;
+
+        public double TRAIN_VIGILANCE = 0.99;
+        public double TEST_VIGILANCE = 0.8;
+
         public int resetLimit = 100;
 
         int[,] F1; //warstwa porównawcza, zawiera wektory wejściowe (N)
@@ -27,8 +27,8 @@ namespace Recognize.Models
 
         public void Train(int[,] data)
         {
-            patternsCount = data.Rows();
-            neuronsCount = data.Columns();
+            //patternsCount = data.Rows();
+            //neuronsCount = data.Columns();
 
             F1 = new int[neuronsCount, 1]; //warstwa porównawcza, zawiera wektory wejściowe (N)
             F2 = new double[patternsCount, 1]; //warstwa rozpoznająca (M - liczba wyjściowych neuronów)  F2 = y
@@ -36,16 +36,12 @@ namespace Recognize.Models
             W = new double[patternsCount, neuronsCount];
             V = new double[patternsCount, neuronsCount];
 
-            W.Set(1.0 / (1.0 + neuronsCount));
+            W.Set(1.0 / (1.0 + neuronsCount)); //krok 1
             V.Set(1);
 
             for (int pattern = 0; pattern < patternsCount; pattern++)
-            {
-                F1 = data.Get(pattern, pattern + 1, 0, neuronsCount);
-
-                F2[pattern, 0] = W.GetRow(pattern).DotWithTransposed(F1)[0]; //krok 2
-
-                MagicIda(F1, true);
+            { 
+                MagicIda(data.Get(pattern, pattern + 1, 0, neuronsCount), true);
             }
 
             trained = true;
@@ -62,38 +58,49 @@ namespace Recognize.Models
         public int MagicIda(int[,] data, bool train)
         {
             int m = 0;
-            bool reset = true;
+            bool condition = false;
             int limit = resetLimit;
 
-            while (reset == true)
+            F1 = data;
+
+            F2.Set(0);
+
+            for (int pattern = 0; pattern < patternsCount; pattern++)
+            {
+                F2[pattern, 0] = W.GetRow(pattern).DotWithTransposed(F1)[0]; //krok 2
+            }
+
+            while (!condition)
             {
                 m = F2.ArgMax().Item1; //krok 3
 
                 double licznik = V.GetRow(m).DotWithTransposed(data)[0];
                 int mianownik = data.Sum();
 
-                reset = TestForReset(licznik, mianownik, m, train);
+                condition = TestProbability(licznik, mianownik, m, train);
 
                 if (--limit == 0)
                     return -1;
             }
 
-            if (train) UpdateWeights(F1, m);
+            //if (train) UpdateWeights(F1, m);
 
 
             return m;
         }
 
-        private bool TestForReset(double licznik, int mianownik, int m, bool train)
+        private bool TestProbability(double licznik, int mianownik, int m, bool train)
         {
             if (licznik / mianownik >= (train ? TRAIN_VIGILANCE : TEST_VIGILANCE))
             {
-                return false;     // Candidate is accepted.
+                UpdateWeights(F1, m);
+                return true;     // Candidate is accepted.
             }
             else
             {
-                F2[m, 0] = -1.0; // Inhibit.
-                return true;      // Candidate is rejected.
+                if (F2.Max() != 0) F2[m, 0] = -1.0; // wyłączenie m-tego neuronu w górnej warstwie
+                else m = m == F2.ArgMax().Item1 ? F2.ArgMax().Item1 + 1 : F2.ArgMax().Item1;
+                return false;      // Candidate is rejected.
             }
         }
 

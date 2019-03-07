@@ -8,8 +8,8 @@ namespace Recognize.Models
 		public int neuronsCount;
 		public int patternsCount;
 
-		public double TRAIN_VIGILANCE = 1;
-		public double TEST_VIGILANCE = 0.5;
+		public double TRAIN_VIGILANCE = 0.99;
+		public double TEST_VIGILANCE = 0.6;
 
 		public int resetLimit = 100;
 
