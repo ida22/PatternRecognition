@@ -21,14 +21,5 @@ namespace Recognize.ViewModels
         }
 
         public IEnumerable<SelectListItem> NumbersList { get; set; }
-
-        public string Number { get; set; }
-
-        public int I { get; set; }
-        public int II { get; set; }
-        public int III { get; set; }
-        public string IV { get; set; }
-        public bool V { get; set; }
-        public string VI { get; set; }
     }
 }

@@ -69,19 +69,19 @@ namespace Recognize.Controllers
                 Random rnd = new Random();
                 int r1 = rnd.Next(1, 63);
                 int r2 = rnd.Next(1, 63);
-                int r3 = rnd.Next(1, 63);
-                int r4 = rnd.Next(1, 63);
-                int r5 = rnd.Next(1, 63);
-                int r6 = rnd.Next(1, 63);
-                int r7 = rnd.Next(1, 63);
-                int r8 = rnd.Next(1, 63);
-                int r9 = rnd.Next(1, 63);
-                int r10 = rnd.Next(1, 63);
-                int r11 = rnd.Next(1, 63);
-                int r12 = rnd.Next(1, 63);
-                int r13 = rnd.Next(1, 63);
-                int r14 = rnd.Next(1, 63);
-                int r15 = rnd.Next(1, 63);
+                //int r3 = rnd.Next(1, 63);
+                //int r4 = rnd.Next(1, 63);
+                //int r5 = rnd.Next(1, 63);
+                //int r6 = rnd.Next(1, 63);
+                //int r7 = rnd.Next(1, 63);
+                //int r8 = rnd.Next(1, 63);
+                //int r9 = rnd.Next(1, 63);
+                //int r10 = rnd.Next(1, 63);
+                //int r11 = rnd.Next(1, 63);
+                //int r12 = rnd.Next(1, 63);
+                //int r13 = rnd.Next(1, 63);
+                //int r14 = rnd.Next(1, 63);
+                //int r15 = rnd.Next(1, 63);
                 //int r16 = rnd.Next(1, 63);
                 //int r17 = rnd.Next(1, 63);
                 //int r18 = rnd.Next(1, 63);
@@ -95,19 +95,19 @@ namespace Recognize.Controllers
 
                 newDisturbed[i, r1] = patterns[i, r1] == 0 ? 1 : 0;
                 newDisturbed[i, r2] = patterns[i, r2] == 0 ? 1 : 0;
-                newDisturbed[i, r3] = patterns[i, r3] == 0 ? 1 : 0;
-                newDisturbed[i, r4] = patterns[i, r4] == 0 ? 1 : 0;
-                newDisturbed[i, r5] = patterns[i, r5] == 0 ? 1 : 0;
-                newDisturbed[i, r6] = patterns[i, r6] == 0 ? 1 : 0;
-                newDisturbed[i, r7] = patterns[i, r7] == 0 ? 1 : 0;
-                newDisturbed[i, r8] = patterns[i, r8] == 0 ? 1 : 0;
-                newDisturbed[i, r9] = patterns[i, r9] == 0 ? 1 : 0;
-                newDisturbed[i, r10] = patterns[i, r10] == 0 ? 1 : 0;
-                newDisturbed[i, r11] = patterns[i, r11] == 0 ? 1 : 0;
-                newDisturbed[i, r12] = patterns[i, r12] == 0 ? 1 : 0;
-                newDisturbed[i, r13] = patterns[i, r13] == 0 ? 1 : 0;
-                newDisturbed[i, r14] = patterns[i, r14] == 0 ? 1 : 0;
-                newDisturbed[i, r15] = patterns[i, r15] == 0 ? 1 : 0;
+                //newDisturbed[i, r3] = patterns[i, r3] == 0 ? 1 : 0;
+                //newDisturbed[i, r4] = patterns[i, r4] == 0 ? 1 : 0;
+                //newDisturbed[i, r5] = patterns[i, r5] == 0 ? 1 : 0;
+                //newDisturbed[i, r6] = patterns[i, r6] == 0 ? 1 : 0;
+                //newDisturbed[i, r7] = patterns[i, r7] == 0 ? 1 : 0;
+                //newDisturbed[i, r8] = patterns[i, r8] == 0 ? 1 : 0;
+                //newDisturbed[i, r9] = patterns[i, r9] == 0 ? 1 : 0;
+                //newDisturbed[i, r10] = patterns[i, r10] == 0 ? 1 : 0;
+                //newDisturbed[i, r11] = patterns[i, r11] == 0 ? 1 : 0;
+                //newDisturbed[i, r12] = patterns[i, r12] == 0 ? 1 : 0;
+                //newDisturbed[i, r13] = patterns[i, r13] == 0 ? 1 : 0;
+                //newDisturbed[i, r14] = patterns[i, r14] == 0 ? 1 : 0;
+                //newDisturbed[i, r15] = patterns[i, r15] == 0 ? 1 : 0;
                 //newDisturbed[i, r16] = patterns[i, r16] == 0 ? 1 : 0;
                 //newDisturbed[i, r17] = patterns[i, r17] == 0 ? 1 : 0;
                 //newDisturbed[i, r18] = patterns[i, r18] == 0 ? 1 : 0;
@@ -122,8 +122,9 @@ namespace Recognize.Controllers
 
 
 
-               stringDisturbed[i] = string.Join("", newDisturbed.GetRow(i));
+                stringDisturbed[i] = string.Join("", newDisturbed.GetRow(i));
             }
+
 
             System.IO.File.WriteAllLines(@"C:\Patterns\symulacje\disturbed.txt", stringDisturbed);
             disturbed = newDisturbed;
@@ -206,6 +207,8 @@ namespace Recognize.Controllers
             var vector = vm.Input.neurons;
             var x = string.Join("", vector);
             var y = string.Join(",", vector);
+            int failCountHP = 0;
+            int failCountART = 0;
 
             var outputVectorHP = new int[testPatterns.Length / 64];
             var outputVectorART = new int[testPatterns.Length / 64];
@@ -237,15 +240,22 @@ namespace Recognize.Controllers
                 outputVectorHP[i] = outHP;
                 outputVectorART[i] = outART;
                 outputVectorART2[i] = outART2;
+
+                if (outHP != i) failCountHP++;
+                if (outART != i) failCountART++;
             }
 
             string stringHP = string.Join("", outputVectorHP);
             string stringART = string.Join("", outputVectorART);
+            string stringFailCount = $"HP: {failCountHP}, ART: {failCountART}";
+
             System.IO.File.WriteAllText(@"C:\Patterns\responseHP.txt", stringHP);
             System.IO.File.WriteAllText(@"C:\Patterns\responseART.txt", stringART);
 
             System.IO.File.WriteAllText(@"C:\Patterns\symulacje\responseHP.txt", stringHP);
             System.IO.File.WriteAllText(@"C:\Patterns\symulacje\responseART.txt", stringART);
+
+            System.IO.File.WriteAllText(@"C:\Patterns\symulacje\bledy.txt", stringFailCount);
 
             var outputMatrixHP = hp.Test(vm.Input.neurons);
             var outputART = art.Test(vm.Input.neurons);
